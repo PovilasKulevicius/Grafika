@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 01.03 - Materials and light</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="../libs/TrackballControls.js"></script>
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/THREEx.KeyboardState.js"></script>
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+        var cameraActive = false, camera_C3Active = false;
+        var cube1_, cube2_, cube3_, cube4_, cube5_, hook, box, step, step_x, step_y, step_z;
+        var Cube5_Y, hook_y;
+        var materialWheel = new THREE.MeshLambertMaterial({color: 0x666666});
+        var materialRope = new THREE.MeshLambertMaterial({color: 0x723A00});
+        var geometryWheel = new THREE.CylinderGeometry( 0.25, 0.25, 0.25, 5 );
+        var geometryWheelSmall = new THREE.CylinderGeometry( 0.1, 0.1, 0.25, 32 );
+            var cylinder = new THREE.Mesh( geometryWheel, materialWheel );
+        var cylinder1 = new THREE.Mesh( geometryWheel, materialWheel);
+        var cylinder2 = new THREE.Mesh( geometryWheel, materialWheel);
+        var cylinder3 = new THREE.Mesh( geometryWheel, materialWheel);
+        var cylinder4 = new THREE.Mesh( geometryWheel, materialWheel);
+        var cylinder5 = new THREE.Mesh( geometryWheel, materialWheel);
+        var cylinder6 = new THREE.Mesh(geometryWheelSmall, materialWheel);
+        var cylinder7 = new THREE.Mesh(geometryWheelSmall, materialWheel);
+        var cylinder8 = new THREE.Mesh(geometryWheelSmall, materialWheel);
+        var cylinder9 = new THREE.Mesh(geometryWheelSmall, materialWheel);
+        var cylinder10 = new THREE.Mesh(geometryWheelSmall, materialWheel);
+        var cylinder11 = new THREE.Mesh(geometryWheelSmall, materialWheel);
+        var cylinder12;
+        var geometryRope;
+        var keyboard = new THREEx.KeyboardState();
+        var finished = false, x = false, dropped = false, down = false, touching_x = false, touching_y = false, touching_z = false, box_position_y, box_position_x, box_position_z;
+        var cube3_position_X,camera_C2_fov = 45;
+
+        var controls = new function() {
+            this.positionX = 1;
+            this.positionZ = 0;
+            this.positionY = 0.05;
+            this.cameraFOV = 52;
+            this.camera_C2_position = -10;
+        };
+
+        var gui = new dat.GUI();
+        gui.add(controls, 'cameraFOV',10,90);
+        gui.add(controls, 'camera_C2_position',-10,-6);
+
+
+        var length = 0.25, width = 0.25;
+
+        var shape = new THREE.Shape();
+        shape.moveTo( 0,0 );
+        shape.lineTo( 0, width );
+        shape.lineTo( length, width );
+        shape.lineTo( length, 0 );
+        shape.lineTo( 0, 0 );
+
+
+        var extrudeSettings = {
+            size: 1,
+            height: 1,
+            steps: 2,
+            depth: 5,
+            bevelEnabled: true,
+            bevelThickness: 20 ,
+            bevelSize: 1,
+            bevelSegments: 1
+        };
+
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+
+
+
+
+
+
+
+
+
+
+
+        //-------------------------------------------------
+        //----------------------------------------------------
+        //----------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(controls.cameraFOV, window.innerWidth / window.innerHeight, 0.1, 1000);
+        //camera.lookAt(new THREE.Vector3(0,0,10));
+
+        var camera_C2 = new THREE.PerspectiveCamera(controls.cameraFOV, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera_C2.position.x = -10;
+        camera_C2.position.y = 7.5;
+        camera_C2.position.z = 5.2;
+        camera_C2.lookAt(new THREE.Vector3(-1,7,5.1));
+        scene.add(camera_C2);
+
+        var material = new THREE.MeshLambertMaterial( { color: 0xDF3131 } );
+
+        var GeometryLens = new THREE.CylinderGeometry(0.5,0.5,1,32);
+        var mesh = new THREE.Mesh( GeometryLens, material ) ;
+        camera_C2.add(mesh);
+        mesh.position.set(0,0,0.5);
+        mesh.rotation.x = 90 * Math.PI/180;
+
+        var GeometryLens = new THREE.CylinderGeometry(0.8,0.8,0.7,32);
+        var mesh = new THREE.Mesh( GeometryLens, material ) ;
+        camera_C2.add(mesh);
+        mesh.position.set(0,1.7,1.2);
+        mesh.rotation.z = 90 * Math.PI/180;
+
+        var GeometryLens = new THREE.CylinderGeometry(0.8,0.8,0.7,32);
+        var mesh = new THREE.Mesh( GeometryLens, material ) ;
+        camera_C2.add(mesh);
+        mesh.position.set(0,1.7,2.5);
+        mesh.rotation.z = 90 * Math.PI/180;
+
+        var GeometryCamera = new THREE.CubeGeometry(1,2,3);
+        var mesh = new THREE.Mesh( GeometryCamera, material ) ;
+        camera_C2.add(mesh);
+        mesh.position.set(0,0.5,1.9);
+
+        var materialLine = new THREE.LineBasicMaterial({
+            color: 0x0000ff
+        });
+
+        var helper = new THREE.CameraHelper( camera_C2 );
+        scene.add(helper);
+
+
+        var camera_C3 = new THREE.PerspectiveCamera(controls.cameraFOV+10, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera_C3.position.x = 10;
+        camera_C3.position.y = 20;
+        camera_C3.position.z = 0;
+        camera_C3.lookAt(new THREE.Vector3(controls.positionX,8.25,0));
+
+        var material = new THREE.MeshLambertMaterial( { color: 0xDF3131 } );
+
+        var GeometryLens = new THREE.CylinderGeometry(0.5,0.5,1,32);
+        var mesh = new THREE.Mesh( GeometryLens, material ) ;
+        camera_C3.add(mesh);
+        mesh.position.set(0,0,0.5);
+        mesh.rotation.x = 90 * Math.PI/180;
+
+        var GeometryLens = new THREE.CylinderGeometry(0.8,0.8,0.7,32);
+        var mesh = new THREE.Mesh( GeometryLens, material ) ;
+        camera_C3.add(mesh);
+        mesh.position.set(0,1.7,1.2);
+        mesh.rotation.z = 90 * Math.PI/180;
+
+        var GeometryLens = new THREE.CylinderGeometry(0.8,0.8,0.7,32);
+        var mesh = new THREE.Mesh( GeometryLens, material ) ;
+        camera_C3.add(mesh);
+        mesh.position.set(0,1.7,2.5);
+        mesh.rotation.z = 90 * Math.PI/180;
+
+        var GeometryCamera = new THREE.CubeGeometry(1,2,3);
+        var mesh = new THREE.Mesh( GeometryCamera, material ) ;
+        camera_C3.add(mesh);
+        mesh.position.set(0,0.5,1.9);
+
+        scene.add(camera_C3);
+//---------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        //renderer.setClearColorHex(0xEEEEEE, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+        // axes helper
+        // var axes = new THREE.AxisHelper( 20 );
+        // scene.add(axes);
+
+
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(60,20);
+        var planeMaterial =    new THREE.MeshLambertMaterial({color: 0xffffff});
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.receiveShadow  = true;
+
+        // rotate and position the plane
+        plane.rotation.x=-0.5*Math.PI;
+        plane.position.x=15;
+        plane.position.y=0;
+        plane.position.z=0;
+
+        // add the plane to the scene
+        scene.add(plane);
+        setupCameras();
+        createStand();
+        createWheels();
+        createCrane();
+
+
+        // position and point the camera to the center of the scene
+        camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.position.set( -30, 60, -10 );
+        spotLight.castShadow = true;
+        scene.add( spotLight );
+
+        var spotLight = new THREE.SpotLight( 0x898989 );
+        spotLight.position.set( 30, 100, 40 );
+        spotLight.castShadow = true;
+        scene.add( spotLight );
+
+        // add the output of the renderer to the html element
+        $("#WebGL-output").append(renderer.domElement);
+        var controlsCamera = new THREE.TrackballControls( camera, renderer.domElement );
+
+        render();
+
+
+        function createStand() {
+
+            // input data
+            var radius = 20;
+            //var roomHeight = 25;
+            var stepThickness = 0.25;
+            var stepWidth = 1;
+            var cubeX, cubeZ;
+
+            var cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+            var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xe6e600});
+
+            var step, cube1, cube2, cube3,cube4, cube5, cube6, i;
+
+            cube1 = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube1.castShadow = true;
+            cube1.position.x = 10;
+            cube1.position.z = -7;
+            cube1.position.y = 7;
+
+            step = new THREE.Object3D();
+            step.add(cube1);
+            scene.add(step);
+
+            cube2 = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube2.castShadow = true;
+            cube2.position.x = 10;
+            cube2.position.z = 7;
+            cube2.position.y = 7;
+
+            step = new THREE.Object3D();
+            step.add(cube2);
+            scene.add(step);
+
+
+            stepThickness = 0.5;
+            stepWidth = 0.25;
+            cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+
+            cube3 = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube3.castShadow = true;
+            cube3.position.x = 10;
+            cube3.position.z = 7;
+            cube3.position.y = 7.25;
+
+            step = new THREE.Object3D();
+            step.add(cube3);
+            scene.add(step);
+
+            cube4 = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube4.castShadow = true;
+            cube4.position.x = 10;
+            cube4.position.z = -7;
+            cube4.position.y = 7.25;
+
+            step = new THREE.Object3D();
+            step.add(cube4);
+            scene.add(step);
+
+
+            stepThickness = 0.25;
+            stepWidth = 1;
+            cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+
+            cube5 = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube5.castShadow = true;
+            cube5.position.x = 10;
+            cube5.position.z = -7;
+            cube5.position.y = 7.5;
+
+            step = new THREE.Object3D();
+            step.add(cube5);
+            scene.add(step);
+
+            cube6 = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube6.castShadow = true;
+            cube6.position.x = 10;
+            cube6.position.z = 7;
+            cube6.position.y = 7.5;
+
+            step = new THREE.Object3D();
+            step.add(cube6);
+            scene.add(step);
+
+
+            for(i = 0; i < 4; i++) {
+
+                switch(i){
+                    case 0: cubeX = 0.5; cubeZ = 7; break;
+                    case 1: cubeX = 19.5; cubeZ = 7; break;
+                    case 2: cubeX = 0.5; cubeZ = -7; break;
+                    case 3: cubeX = 19.5, cubeZ = -7; break;
+                }
+
+                var cubeGeometry2 = new THREE.CubeGeometry(1, 7, 1);
+                cube3 = new THREE.Mesh(cubeGeometry2, cubeMaterial);
+
+                cube3.castShadow = true;
+                cube3.position.x = cubeX;
+                cube3.position.z = cubeZ;
+                cube3.position.y = 3.5;
+
+                step = new THREE.Object3D();
+                step.add(cube3);
+                scene.add(step);
+
+            }
+
+        }
+
+        function createWheels() {
+            var step;
+            //var material = new THREE.MeshLambertMaterial({color: 0x666666});
+
+            cylinder.castShadow = true;
+            cylinder.position.x = controls.positionX-0.5;
+            cylinder.position.y = 7.874;
+            cylinder.position.z = 7;
+            cylinder.rotation.x = Math.PI/2;
+
+            step = new THREE.Object3D();
+            step.add(cylinder);
+
+            cylinder1.castShadow = true;
+            cylinder1.position.x = controls.positionX-0.5;
+            cylinder1.position.y = 7.874;
+            cylinder1.position.z = -7;
+            cylinder1.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder1);
+
+
+            cylinder2.castShadow = true;
+            cylinder2.position.x = controls.positionX;
+            cylinder2.position.y = 7.874;
+            cylinder2.position.z = 7;
+            cylinder2.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder2);
+
+
+            cylinder3.castShadow = true;
+            cylinder3.position.x = controls.positionX;
+            cylinder3.position.y = 7.874;
+            cylinder3.position.z = -7;
+            cylinder3.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder3);
+
+
+            cylinder4.castShadow = true;
+            cylinder4.position.x = controls.positionX+0.5;
+            cylinder4.position.y = 7.874;
+            cylinder4.position.z = 7;
+            cylinder4.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder4);
+
+
+            cylinder5.castShadow = true;
+            cylinder5.position.x = controls.positionX+0.5;
+            cylinder5.position.y = 7.874;
+            cylinder5.position.z = -7;
+            cylinder5.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder5);
+
+
+            cylinder6.castShadow = true;
+            cylinder6.position.x = controls.positionX-0.5;
+            cylinder6.position.y = 7.874;
+            cylinder6.position.z = 6.8;
+            cylinder6.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder6);
+
+
+            cylinder7.castShadow = true;
+            cylinder7.position.x = controls.positionX;
+            cylinder7.position.y = 7.874;
+            cylinder7.position.z = 6.8;
+            cylinder7.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder7);
+
+
+            cylinder8.castShadow = true;
+            cylinder8.position.x = controls.positionX+0.5;
+            cylinder8.position.y = 7.874;
+            cylinder8.position.z = 6.8;
+            cylinder8.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder8);
+
+
+            cylinder9.castShadow = true;
+            cylinder9.position.x = controls.positionX-0.5;
+            cylinder9.position.y = 7.874;
+            cylinder9.position.z = -6.8;
+            cylinder9.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder9);
+
+
+            cylinder10.castShadow = true;
+            cylinder10.position.x = controls.positionX;
+            cylinder10.position.y = 7.874;
+            cylinder10.position.z = -6.8;
+            cylinder10.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder10);
+
+
+            cylinder11.castShadow = true;
+            cylinder11.position.x = controls.positionX+0.5;
+            cylinder11.position.y = 7.874;
+            cylinder11.position.z = -6.8;
+            cylinder11.rotation.x = Math.PI/2;
+
+            //step = new THREE.Object3D();
+            step.add(cylinder11);
+
+            scene.add(step);
+        }
+
+        function createCrane(){
+            //Base--------------------------------------------------------------------
+            var radius = 2;
+            //var roomHeight = 25;
+            var stepThickness = 0.4;
+            var stepWidth = 0.5;
+
+            var cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+            var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xD47109});
+
+            cube1_ = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube1_.castShadow = true;
+            cube1_.position.x = controls.positionX;
+            cube1_.position.z = 6.43;
+            cube1_.position.y = 7.9;
+
+            step = new THREE.Object3D();
+            step.add(cube1_);
+            scene.add(step);
+
+            cube2_ = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube2_.castShadow = true;
+            cube2_.position.x = controls.positionX;
+            cube2_.position.z = -6.43;
+            cube2_.position.y = 7.9;
+
+            step = new THREE.Object3D();
+            step.add(cube2_);
+            scene.add(step);
+
+            radius = 13.36;
+            //var roomHeight = 25;
+            stepThickness = .5;
+            stepWidth = 2;
+
+            cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+
+            cube3_ = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube3_.castShadow = true;
+            cube3_.position.x = controls.positionX;
+            cube3_.position.z = 0;
+            cube3_.position.y = 8.25;
+            cube3_.rotation.y = Math.PI/2;
+
+            step = new THREE.Object3D();
+            step.add(cube3_);
+            scene.add(step);
+            //----------------------------------------------------------------------------------
+
+            //Crane-----------------------------------------------------------------------------
+            radius = 2;
+            //var roomHeight = 25;
+            stepThickness = 0.5;
+            stepWidth = 1.8;
+
+            cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+            cubeMaterial = new THREE.MeshLambertMaterial({color: 0xDF3131});
+
+            cube4_ = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube4_.castShadow = true;
+            cube4_.position.x = controls.positionX;
+            cube4_.position.z = controls.positionZ;
+            cube4_.position.y = 8;
+            cube4_.rotation.y = Math.PI/2;
+
+            step = new THREE.Object3D();
+            step.add(cube4_);
+            scene.add(step);
+
+            Cube5_Y = controls.positionY-7.45;
+
+
+            geometryRope = new THREE.CylinderGeometry( 0.1, 0.1, Cube5_Y, 32 );
+            geometryRope.applyMatrix(new THREE.Matrix4().makeTranslation( 0, -3.7, 0 ) );
+            cylinder12 = new THREE.Mesh(geometryRope, materialRope);
+            //cylinder12.translateOnAxis(0,0.05,0);
+
+            cylinder12.castShadow = true;
+            cylinder12.position.x = controls.positionX;
+            cylinder12.position.z = controls.positionZ;
+            cylinder12.position.y = 7.8;
+            cylinder12.scale.y = controls.positionY;
+            //cylinder12.rotation.y = Math.PI;
+
+            //cylinder12.translate( 0, 0, 0);
+
+            step = new THREE.Object3D();
+            step.add(cylinder12);
+            scene.add(step);
+
+            radius = 0.5;
+            //var roomHeight = 25;
+            stepThickness = 0.5;
+            stepWidth = 0.5;
+
+            cubeGeometry1 = new THREE.CubeGeometry(radius,stepThickness,stepWidth);
+            cubeMaterial = new THREE.MeshLambertMaterial({color: 0xDF3131});
+            //cubeGeometry1.applyMatrix(new THREE.Matrix4().makeTranslation( 0, 3.7, 0 ) );
+            cube5_ = new THREE.Mesh(cubeGeometry1, cubeMaterial);
+
+            cube5_.castShadow = true;
+            cube5_.position.x = controls.positionX;
+            cube5_.position.z = controls.positionZ;
+            cube5_.position.y = controls.positionY+7.2;
+            //cube5_.rotation.y = Math.PI/2;
+
+            step = new THREE.Object3D();
+            step.add(cube5_);
+            scene.add(step);
+
+
+            function CustomSinCurve( scale ) {
+
+                THREE.Curve.call( this );
+
+                this.scale = ( scale === undefined ) ? 1 : scale;
+
+            }
+
+            CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
+            CustomSinCurve.prototype.constructor = CustomSinCurve;
+
+            CustomSinCurve.prototype.getPoint = function ( t ) {
+
+                var tx = t  * 2;
+                var ty = Math.sin( - Math.PI * t )+7.2;
+                var tz = 1;
+
+                return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+            };
+
+            var path = new CustomSinCurve( 0.2 );
+            var geometry = new THREE.TubeGeometry( path, 30, 0.05, 10, false );
+            var material = new THREE.MeshLambertMaterial( { color: 0xDF3131 } );
+            hook = new THREE.Mesh( geometry, material );
+            hook.castShadow = true;
+            hook.rotation.z = Math.PI/6;
+            hook.position.x = controls.positionX+0.5;
+            hook.position.z = controls.positionZ-0.2;
+            hook.position.y = controls.positionY+5.6;
+            scene.add( hook );
+
+            var geometryBox = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            cubeGeometry1 = new THREE.CubeGeometry(1.5,1.5,1.5);
+            geometryBox.applyMatrix(new THREE.Matrix4().makeTranslation( 0, 0, -50 ) );
+            cubeMaterial = new THREE.MeshLambertMaterial({color: 0x444444});
+            //cubeGeometry1.applyMatrix(new THREE.Matrix4().makeTranslation( 0, 3.7, 0 ) );
+            box = new THREE.Mesh(geometryBox, cubeMaterial);
+            box.scale.z = 0.02;
+            box.scale.y = 0.65;
+            box.castShadow = true;
+            box_position_x = 19;/*Math.floor(Math.random() * (19 - 1 + 1)) + 1;*/
+            box.position.x = box_position_x;
+            box_position_z = 0;/*Math.floor(Math.random() * (5 - -5 + 1)) + -5;*/
+            box.position.z = box_position_z;
+            box_position_y = 0.75;
+            box.position.y = box_position_y;
+            scene.add(box);
+
+
+
+            material = new THREE.MeshLambertMaterial( { color: 0xDF3131 } );
+            var mesh = new THREE.Mesh( geometry, material ) ;
+
+
+            // step_x = box_position_x/100;
+            // step_y = box_position_y/100;
+            // step_z = box_position_z/100;
+
+        }
+
+        function setupCameras() {
+
+        }
+
+
+        function render() {
+
+
+            // cube1_.position.x = controls.positionX;
+            // cube2_.position.x = controls.positionX;
+            // cube3_.position.x = controls.positionX;
+            // cube4_.position.x = controls.positionX;
+            //cube4_.position.z = controls.positionZ;
+            // cylinder.position.x = controls.positionX-0.5;
+            // cylinder1.position.x = controls.positionX-0.5;
+            // cylinder2.position.x = controls.positionX;
+            // cylinder3.position.x = controls.positionX;
+            // cylinder4.position.x = controls.positionX+0.5;
+            // cylinder5.position.x = controls.positionX+0.5;
+            // cylinder6.position.x = controls.positionX-0.5;
+            // cylinder7.position.x = controls.positionX;
+            // cylinder8.position.x = controls.positionX+0.5;
+            // cylinder9.position.x = controls.positionX-0.5;
+            // cylinder10.position.x = controls.positionX;
+            // cylinder11.position.x = controls.positionX+0.5;
+            // cylinder12.position.x = controls.positionX;
+            // cylinder12.position.z = controls.positionZ;
+            //cylinder12.position.y = controls.positionY;
+
+
+            //cylinder12.scale.y = controls.positionY;
+
+            Cube5_Y = controls.positionY+7.5;
+            for(var i = 0; i < controls.positionY; i += 0.001){
+                Cube5_Y -= 0.008;
+            }
+
+            //cube5_.position.y = Cube5_Y;
+            //cube5_.position.x = controls.positionX;
+            //cube5_.position.z = controls.positionZ;
+
+            hook_y = controls.positionY+5.8;
+            for(i = 0; i < controls.positionY; i += 0.001){
+                hook_y -= 0.008;
+            }
+
+            //hook.position.x = controls.positionX+0.4;
+            //hook.position.z = controls.positionZ-0.2;
+            //hook.position.y = hook_y;
+
+            // cylinder.rotation.y = -controls.positionX;
+            // cylinder1.rotation.y = -controls.positionX;
+            // cylinder2.rotation.y = -controls.positionX;
+            // cylinder3.rotation.y = -controls.positionX;
+            // cylinder4.rotation.y = -controls.positionX;
+
+            if(cube3_.position.x <= box.position.x && touching_x === false){
+                cube1_.position.x+= 0.05;
+                cube2_.position.x+= 0.05;
+                cube3_.position.x+= 0.05;
+                cube3_position_X = cube3_.position.x;
+                cube4_.position.x+= 0.05;
+                cylinder.position.x += 0.05 ;
+                cylinder1.position.x+= 0.05 ;
+                cylinder2.position.x+= 0.05 ;
+                cylinder3.position.x+= 0.05 ;
+                cylinder4.position.x+= 0.05 ;
+                cylinder5.position.x+= 0.05 ;
+                cylinder6.position.x += 0.05;
+                cylinder7.position.x += 0.05;
+                cylinder8.position.x += 0.05;
+                cylinder9.position.x += 0.05;
+                cylinder10.position.x += 0.05;
+                cylinder11.position.x += 0.05;
+                cylinder12.position.x += 0.05;
+                cube5_.position.x += 0.05;
+                hook.position.x += 0.05;
+                cylinder.rotation.y -= 0.05;
+                cylinder1.rotation.y -= 0.05;
+                cylinder2.rotation.y -= 0.05;
+                cylinder3.rotation.y -= 0.05;
+                cylinder4.rotation.y -= 0.05;
+
+            } else {touching_x = true;}
+            if(box.position.z > 0){
+                if(cube4_.position.z <= box.position.z) {
+                    cube4_.position.z += 0.05;
+                    cylinder12.position.z += 0.05;
+                    cube5_.position.z += 0.05;
+                    hook.position.z += 0.05;
+                }else {touching_z = true}
+            }else{
+                if(cube4_.position.z >= box.position.z) {
+                    cube4_.position.z -= 0.05;
+                    cylinder12.position.z -= 0.05;
+                    cube5_.position.z -= 0.05;
+                    hook.position.z -= 0.05;
+                } else {touching_z = true}
+            }
+
+            if(cube5_.position.y >= box.position.y+1.2 && touching_x === true && touching_z === true && x === false && finished === false){
+                hook.position.y -= 0.05;
+                cube5_.position.y -= 0.05;
+                cylinder12.scale.y += 0.007;
+
+            } else {touching_y = true;}
+
+            if(cube5_.position.y <= box.position.y+1.2 && finished === false && x === false && touching_x === true && touching_y === true && touching_z === true){
+                if(cube5_.position.y < 7 && down === false) {
+                    hook.position.y += 0.05;
+                    cube5_.position.y += 0.05;
+                    cylinder12.scale.y -= 0.007;
+                    box.position.y += 0.05;
+                } else if(cube5_.position.x >= 1 && down === false ){
+                    cube1_.position.x-= 0.05;
+                    cube2_.position.x-= 0.05;
+                    cube3_.position.x-= 0.05;
+                    cube3_position_X = cube3_.position.x;
+                    cube4_.position.x-= 0.05;
+                    cylinder.position.x -= 0.05 ;
+                    cylinder1.position.x-= 0.05 ;
+                    cylinder2.position.x-= 0.05 ;
+                    cylinder3.position.x-= 0.05 ;
+                    cylinder4.position.x-= 0.05 ;
+                    cylinder5.position.x-= 0.05 ;
+                    cylinder6.position.x -= 0.05;
+                    cylinder7.position.x -= 0.05;
+                    cylinder8.position.x -= 0.05;
+                    cylinder9.position.x -= 0.05;
+                    cylinder10.position.x -= 0.05;
+                    cylinder11.position.x -= 0.05;
+                    cylinder12.position.x -= 0.05;
+                    cube5_.position.x -= 0.05;
+                    hook.position.x -= 0.05;
+                    cylinder.rotation.y += 0.05;
+                    cylinder1.rotation.y += 0.05;
+                    cylinder2.rotation.y += 0.05;
+                    cylinder3.rotation.y += 0.05;
+                    cylinder4.rotation.y += 0.05;
+                    box.position.x -= 0.05;
+                } else if(box.position.z < 5){
+                    cube4_.position.z += 0.05;
+                    cylinder12.position.z += 0.05;
+                    cube5_.position.z += 0.05;
+                    hook.position.z += 0.05;
+                    box.position.z += 0.05;
+                } else{down = true}
+
+                if(down === true && box.position.y > 0.75 && x === false){
+                    hook.position.y -= 0.05;
+                    cube5_.position.y -= 0.05;
+                    cylinder12.scale.y += 0.007;
+                    box.position.y -= 0.05;
+                    if(box.position.y <= 0.75){
+                        //down = false;
+                        x = true;
+                    }
+                }
+            }
+
+            if(x === true){
+                down = false;
+                dropped = true;
+                hook.position.y += 0.05;
+                cube5_.position.y += 0.05;
+                cylinder12.scale.y -= 0.007;
+                if(cube5_.position.y > 7){
+                    x = false;
+                    finished = true;
+                }
+            }
+
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+            //---------------------------------------------------------
+
+            //camera.lookAt(new THREE.Vector3(0,10,5));
+            camera.fov = controls.cameraFOV;
+            camera.updateProjectionMatrix();
+
+            if(keyboard.pressed("1")){
+                cameraActive = false;
+                camera_C3Active = false;
+            }
+            if(keyboard.pressed("2")){
+                cameraActive = true;
+                camera_C3Active = false;
+            }if(keyboard.pressed("3")){
+                camera_C3Active = true;
+                cameraActive = false;
+            }
+
+            if(!cameraActive) {
+                renderer.render( scene, camera );
+            } else if(cameraActive){
+                renderer.render(scene, camera_C2);
+            } if(camera_C3Active){
+                renderer.render(scene, camera_C3);
+            }
+
+            camera_C3.lookAt(new THREE.Vector3(cube3_.position.x,8.25,0));
+            //camera_C3.rotation.z = 90 * Math.PI / 180;
+
+            for (var i = 0; i < cube3_.position.x;i++){
+
+            }
+
+            camera_C3.rotation.z = cube3_.position.x*Math.PI/18+(80*Math.PI/180);
+            camera_C3.updateProjectionMatrix();
+
+            camera_C2.lookAt(new THREE.Vector3(cube5_.position.x,cube5_.position.y,cube5_.position.z));
+
+            camera_C2.position.x = controls.camera_C2_position;
+
+            // for(var i = 0; i > controls.camera_C2_position; i ++){
+            //     camera_C2_fov -= 0.008;
+            // }
+            camera_C2.fov = controls.camera_C2_position*6+100;
+            camera_C2.updateProjectionMatrix();
+
+            helper.update();
+
+            stats.update();
+            requestAnimationFrame( render );
+            //controlsCamera.update();
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+
+            stats.setMode(0); // 0: fps, 1: ms
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            $("#Stats-output").append(stats.domElement);
+
+            return stats;
+        }
+    });
+
+
+    //kabliukui tubegeometry
+</script>
+</body>
+</html>

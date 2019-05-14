@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 01.03 - Materials and light</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="../libs/TrackballControls.js"></script>
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+        var Base, Base_shoulder, cube, step;
+        var geometry_shoulder, cube1_, cube2_, cube3_, cube4_, cylinder;
+
+
+        var controls = new function () {
+            this.Base_spin = 0;
+            this.Shoulder_spin = 0;
+            this.Lenght = 0.75;
+        };
+
+        var gui = new dat.GUI();
+        gui.add(controls, 'Base_spin', 0, 7);
+        gui.add(controls, 'Shoulder_spin', -1.75, 1.75);
+        gui.add(controls, 'Lenght', 0.75, 1.70);
+
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColorHex(0xEEEEEE, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+        // axes helper
+        // var axes = new THREE.AxisHelper( 20 );
+        // scene.add(axes);
+
+
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(60, 20);
+        var planeMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
+        var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+
+        // rotate and position the plane
+        plane.rotation.x = -0.5 * Math.PI;
+        plane.position.x = 15;
+        plane.position.y = 0;
+        plane.position.z = 0;
+
+        // add the plane to the scene
+        scene.add(plane);
+
+        createBase();
+
+
+        // position and point the camera to the center of the scene
+        camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-30, 60, -10);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        spotLight = new THREE.SpotLight(0x898989);
+        spotLight.position.set(30, 100, 40);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        // add the output of the renderer to the html element
+        $("#WebGL-output").append(renderer.domElement);
+        var controlsCamera = new THREE.TrackballControls(camera, renderer.domElement);
+
+        render();
+
+
+        function createBase() {
+            var materialBase = new THREE.MeshLambertMaterial({color: 0xFF8200});
+            var geometryBase = new THREE.CylinderGeometry( 2, 2, 1, 32 );
+            Base = new THREE.Mesh( geometryBase, materialBase );
+
+            Base.position.x = 0;
+            Base.position.y = 0.5;
+            Base.position.z = 0;
+            Base.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(Base);
+            scene.add(step);
+
+            var cubeGeometry = new THREE.CubeGeometry(1.5,4,1.5);
+            cube = new THREE.Mesh(cubeGeometry, materialBase);
+            cube.position.y = 2;
+            cube.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(cube);
+            scene.add(step);
+
+            geometry_shoulder = new THREE.CylinderGeometry( 1.5, 1.5, 3, 32 );
+            geometry_shoulder.applyMatrix(new THREE.Matrix4().makeTranslation( 0, 0.7, 0 ) );
+            Base_shoulder = new THREE.Mesh( geometry_shoulder, materialBase );
+            Base_shoulder.rotation.x = Math.PI/2;
+            Base_shoulder.position.y = 4.5;
+            Base_shoulder.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(Base_shoulder);
+            scene.add(step);
+
+            var cubeGeometry1 = new THREE.CubeGeometry(1.5,4,1.5);
+            cubeGeometry1.applyMatrix(new THREE.Matrix4().makeTranslation( 0, 1.7, 1.4 ) );
+            materialBase = new THREE.MeshLambertMaterial({color: 0x2E9600});
+            cube1_ = new THREE.Mesh(cubeGeometry1, materialBase);
+            cube1_.position.y = 4.5;
+            cube1_.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(cube1_);
+            scene.add(step);
+
+            var cubeGeometry2 = new THREE.CubeGeometry(2,1.5,3.5);
+            cubeGeometry2.applyMatrix(new THREE.Matrix4().makeTranslation( 0, 3.5, 0.65 ) );
+            materialBase = new THREE.MeshLambertMaterial({color: 0x0B5394});
+            cube2_ = new THREE.Mesh(cubeGeometry2, materialBase);
+            cube2_.position.y = 4.5;
+            cube2_.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(cube2_);
+            scene.add(step);
+
+            var cubeGeometry3 = new THREE.CubeGeometry(4,1,1);
+            cubeGeometry3.applyMatrix(new THREE.Matrix4().makeTranslation( -1, 3.5, 0 ) );
+            materialBase = new THREE.MeshLambertMaterial({color: 0x0B5394});
+            cube3_ = new THREE.Mesh(cubeGeometry3, materialBase);
+            cube3_.position.y = 4.5;
+            cube3_.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(cube3_);
+            scene.add(step);
+
+            var cubeGeometry4 = new THREE.CubeGeometry(2,0.5,0.5);
+            cubeGeometry4.applyMatrix(new THREE.Matrix4().makeTranslation( 1, 3.5, 0 ) );
+            materialBase = new THREE.MeshLambertMaterial({color: 0xB00000});
+            cube4_ = new THREE.Mesh(cubeGeometry4, materialBase);
+            cube4_.position.y = 4.5;
+            cube4_.castShadow = true;
+
+            step = new THREE.Object3D();
+            //step.add(cube4_);
+            scene.add(step);
+
+            var cylinder_geometry = new THREE.CylinderGeometry(0.05, 0.35, 4, 32 );
+            cylinder_geometry.applyMatrix(new THREE.Matrix4().makeTranslation( -3.55, 1, 0 ) );
+            materialBase = new THREE.MeshLambertMaterial({color: 0xFFFF00});
+            cylinder = new THREE.Mesh( cylinder_geometry, materialBase );
+            //cylinder.rotation.x = Math.PI/2;
+            cylinder.rotation.z = -Math.PI/2;
+            // cylinder.rotation.y = Math.PI/2;
+            cylinder.position.y = 4.5;
+            cylinder.castShadow = true;
+
+            step = new THREE.Object3D();
+            step.add(cylinder);
+            scene.add(step);
+        }
+
+
+        function render() {
+            // render
+
+            Base.rotation.y = controls.Base_spin;
+            cube.rotation.y = controls.Base_spin;
+
+            Base_shoulder.rotation.z = -controls.Base_spin;
+
+            cube1_.rotation.y = controls.Base_spin;
+            cube1_.rotation.z = -controls.Shoulder_spin;
+
+            cube2_.rotation.y = controls.Base_spin;
+            cube2_.rotation.z = -controls.Shoulder_spin;
+
+            cube3_.rotation.y = controls.Base_spin;
+            cube3_.rotation.z = -controls.Shoulder_spin;
+
+            cube4_.scale.x = controls.Lenght*1.2;
+
+            cube4_.rotation.y = controls.Base_spin;
+            cube4_.rotation.z = -controls.Shoulder_spin;
+
+            cylinder.rotation.y = controls.Base_spin;
+            cylinder.scale.y = controls.Lenght/1.1;
+
+            // cylinder.applyMatrix(new THREE.Matrix4().makeTranslation( 3.55, 0, 0 ) );
+            //cylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, controls.Lenght, 0 ) );
+            //cylinder.position.x = controls.Lenght;
+            cylinder.rotation.z = -controls.Shoulder_spin + -Math.PI/2;
+
+
+            stats.update();
+            renderer.render( scene, camera );
+            requestAnimationFrame( render );
+            controlsCamera.update();
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+
+            stats.setMode(0); // 0: fps, 1: ms
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            $("#Stats-output").append(stats.domElement);
+
+            return stats;
+        }
+
+        // function rotateAroundWorldAxis(object, axis, radians) {
+        //     rotWorldMatrix = new THREE.Matrix4();
+        //     rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+        //     rotWorldMatrix.multiplySelf(object.matrix);        // pre-multiply
+        //     object.matrix = rotWorldMatrix;
+        //     object.rotation.getRotationFromMatrix(object.matrix, object.scale);
+        // }
+    });
+
+
+    //kabliukui tubegeometry
+</script>
+</body>
+</html>
